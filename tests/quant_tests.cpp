@@ -114,6 +114,52 @@ TEST(EuropeanOptionTest, FuturesOptionCarryModelZeroesCostOfCarry) {
     EXPECT_NE(stockOption.price(), futuresOption.price());
 }
 
+TEST(EuropeanOptionTest, ContinuousDividendYieldCarryModelLowersCallPrice) {
+    // b = r - q (Merton, 1973): with a positive dividend yield, the call
+    // must be worth less than under the plain stock-option model (b = r),
+    // since the dividend reduces the effective forward drift of the spot.
+    OptionParameters params{
+        .spot = 100.0, .strike = 100.0, .volatility = 0.2,
+        .riskFreeRate = 0.05, .timeToExpiry = 1.0, .dividendYield = 0.03,
+    };
+    EuropeanOption stockOption(params, OptionType::Call, CarryModel::StockOption);
+    EuropeanOption dividendOption(params, OptionType::Call, CarryModel::ContinuousDividendYield);
+    EXPECT_LT(dividendOption.price(), stockOption.price());
+}
+
+TEST(EuropeanOptionTest, CurrencyOptionCarryModelMatchesStockOptionToday) {
+    // Garman-Kohlhagen (1983) properly uses b = domestic_r - foreign_r;
+    // this library doesn't yet model a separate foreign rate, so
+    // CurrencyOption currently falls back to b = r, identically to
+    // StockOption. This test documents that known simplification so a
+    // future fix (adding a foreign-rate parameter) has a test to update
+    // rather than a silent behavior change.
+    OptionParameters params{
+        .spot = 1.10, .strike = 1.05, .volatility = 0.1,
+        .riskFreeRate = 0.04, .timeToExpiry = 0.25,
+    };
+    EuropeanOption stockOption(params, OptionType::Call, CarryModel::StockOption);
+    EuropeanOption currencyOption(params, OptionType::Call, CarryModel::CurrencyOption);
+    EXPECT_DOUBLE_EQ(currencyOption.price(), stockOption.price());
+}
+
+TEST(EuropeanOptionTest, ToStringIncludesTypeAndParameters) {
+    OptionParameters params{
+        .spot = 100.0, .strike = 95.0, .volatility = 0.25,
+        .riskFreeRate = 0.04, .timeToExpiry = 0.75,
+    };
+    EuropeanOption option(params, OptionType::Put);
+    const std::string s = option.toString();
+    EXPECT_NE(s.find("Put"), std::string::npos);
+    EXPECT_NE(s.find("95"), std::string::npos);
+}
+
+TEST(StandardNormalTest, PdfPeaksAtZeroAndIsSymmetric) {
+    EXPECT_NEAR(standardNormalPdf(0.0), 0.3989422804014327, 1e-12);
+    EXPECT_DOUBLE_EQ(standardNormalPdf(1.5), standardNormalPdf(-1.5));
+    EXPECT_GT(standardNormalPdf(0.0), standardNormalPdf(1.0));
+}
+
 TEST(MatrixPricerTest, PricesEachScenarioInTheSweep) {
     ParameterSweep sweep{
         .timeToExpiry = {0.5, 1.0},

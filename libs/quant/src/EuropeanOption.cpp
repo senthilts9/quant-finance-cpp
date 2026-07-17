@@ -31,7 +31,7 @@ double EuropeanOption::costOfCarry() const noexcept {
     return params_.riskFreeRate;
 }
 
-double EuropeanOption::callPrice(double spot) const {
+double EuropeanOption::callPrice(double spot) const noexcept {
     const double b = costOfCarry();
     const double sigma = params_.volatility;
     const double t = params_.timeToExpiry;
@@ -45,7 +45,7 @@ double EuropeanOption::callPrice(double spot) const {
            k * std::exp(-r * t) * standardNormalCdf(d2);
 }
 
-double EuropeanOption::putPrice(double spot) const {
+double EuropeanOption::putPrice(double spot) const noexcept {
     const double b = costOfCarry();
     const double sigma = params_.volatility;
     const double t = params_.timeToExpiry;
@@ -59,7 +59,7 @@ double EuropeanOption::putPrice(double spot) const {
            spot * std::exp((b - r) * t) * standardNormalCdf(-d1);
 }
 
-double EuropeanOption::price(double spot) const {
+double EuropeanOption::price(double spot) const noexcept {
     return type_ == OptionType::Call ? callPrice(spot) : putPrice(spot);
 }
 
@@ -72,7 +72,7 @@ std::vector<double> EuropeanOption::priceOverMesh(const std::vector<double>& spo
     return result;
 }
 
-double EuropeanOption::parityResidual() const {
+double EuropeanOption::parityResidual() const noexcept {
     const double s = params_.spot;
     const double k = params_.strike;
     const double discountedStrike = k * std::exp(-params_.riskFreeRate * params_.timeToExpiry);
@@ -83,7 +83,7 @@ double EuropeanOption::parityResidual() const {
     return (putPrice(s) + s) - (callPrice(s) + discountedStrike);
 }
 
-bool EuropeanOption::satisfiesPutCallParity(double tolerance) const {
+bool EuropeanOption::satisfiesPutCallParity(double tolerance) const noexcept {
     return std::abs(parityResidual()) < tolerance;
 }
 

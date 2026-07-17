@@ -21,14 +21,14 @@ public:
                              OptionType type = OptionType::Call,
                              CarryModel model = CarryModel::StockOption);
 
-    [[nodiscard]] double price(double spot) const;
-    [[nodiscard]] double price() const { return price(params_.spot); }
+    [[nodiscard]] double price(double spot) const noexcept;
+    [[nodiscard]] double price() const noexcept { return price(params_.spot); }
     [[nodiscard]] std::vector<double> priceOverMesh(const std::vector<double>& spotMesh) const;
 
     // Residual of the put-call parity identity, evaluated at the option's
     // own spot/strike. Zero (within tolerance) means parity holds.
-    [[nodiscard]] double parityResidual() const;
-    [[nodiscard]] bool satisfiesPutCallParity(double tolerance = 1e-6) const;
+    [[nodiscard]] double parityResidual() const noexcept;
+    [[nodiscard]] bool satisfiesPutCallParity(double tolerance = 1e-6) const noexcept;
 
     void toggleType() noexcept;
     [[nodiscard]] OptionType type() const noexcept { return type_; }
@@ -47,8 +47,8 @@ public:
 
 private:
     [[nodiscard]] double costOfCarry() const noexcept;
-    [[nodiscard]] double callPrice(double spot) const;
-    [[nodiscard]] double putPrice(double spot) const;
+    [[nodiscard]] double callPrice(double spot) const noexcept;
+    [[nodiscard]] double putPrice(double spot) const noexcept;
 
     OptionParameters params_{};
     OptionType type_ = OptionType::Call;

@@ -29,7 +29,7 @@ int main() {
     }
 
     try {
-        stack.pop();
+        (void)stack.pop();
     } catch (const StackEmptyException& e) {
         std::cout << "Expected failure popping an empty stack: " << e.what() << '\n';
     }

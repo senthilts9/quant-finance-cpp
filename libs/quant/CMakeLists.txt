@@ -1,6 +1,7 @@
 add_library(quant
     src/EuropeanOption.cpp
     src/MatrixPricer.cpp
+    src/BatchPricer.cpp
 )
 add_library(qfcpp::quant ALIAS quant)
 

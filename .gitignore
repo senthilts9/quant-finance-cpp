@@ -1,5 +1,8 @@
 build/
+build-*/
 out/
+coverage.info
+coverage-html/
 CMakeUserPresets.json
 CMakeCache.txt
 CMakeFiles/

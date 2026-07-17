@@ -19,7 +19,8 @@ libraries with full unit test coverage and CI.
 libs/
   geometry/    Shape / Point / Line / Circle — small polymorphic CAD kernel
   containers/  Array<T> / NumericArray<T> / Stack<T> — RAII, bounds-checked
-  quant/       EuropeanOption / MatrixPricer — Black-Scholes-family pricer
+  quant/       EuropeanOption / MatrixPricer / BatchPricer — Black-Scholes
+               pricer, scenario sweeps, and a branch-free batch kernel
 apps/
   geometry_demo/          polymorphic dispatch over Shape*
   containers_demo/        Stack<Point> push/pop + exception handling
@@ -29,6 +30,9 @@ tests/
   containers_tests.cpp    GoogleTest suite for libs/containers
   quant_tests.cpp         GoogleTest suite for libs/quant, incl. regression
                           tests against published closed-form reference prices
+  batch_pricer_tests.cpp  GoogleTest suite for the batch kernel + fast CDF
+benchmarks/
+  quant_benchmarks.cpp    Google Benchmark suite (opt-in, see PERFORMANCE.md)
 ```
 
 ### `libs/quant` — the main deliverable
@@ -50,7 +54,11 @@ time-to-expiry, volatility, rate, strike, and spot) against one option
 configuration in a single call.
 
 The normal PDF/CDF used internally are implemented with `std::erfc` from
-`<cmath>`, so the library has **no third-party dependency**.
+`<cmath>`, so the library has **no third-party dependency**. For
+latency-sensitive batch pricing, `quant/BatchPricer.hpp` adds a separate
+allocation-free, branch-free kernel (`priceEuropeanCallsBatch`) with a
+fixed-cost normal CDF approximation — see [PERFORMANCE.md](PERFORMANCE.md)
+for what that trades off and measured results.
 
 ## Building
 
@@ -85,6 +93,15 @@ against independently-known results, not just self-consistency.
 
 CI (`.github/workflows/ci.yml`) builds and runs the full test suite on
 Ubuntu (GCC, Clang) and Windows (MSVC) on every push and pull request.
+See [PERFORMANCE.md](PERFORMANCE.md) for the coverage-tooling setup and a
+checklist mapping test files to what they cover.
+
+## Performance
+
+Benchmarked with Google Benchmark against published reference prices and
+measured, not assumed, numbers — see [PERFORMANCE.md](PERFORMANCE.md) for
+the full methodology, results, and what a genuinely latency-critical
+deployment would still need beyond this library.
 
 ## License
 
