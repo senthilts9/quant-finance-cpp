@@ -4,6 +4,8 @@
 ![C++](https://img.shields.io/badge/C%2B%2B-20-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
+![Project showcase: architecture, quant exposure, performance, and testing at a glance](docs/project-showcase.png)
+
 A modern C++20 library for closed-form European option pricing, built and
 tested with CMake + GoogleTest, with CI on Linux (GCC, Clang) and Windows
 (MSVC).
