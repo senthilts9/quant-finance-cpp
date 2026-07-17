@@ -68,8 +68,10 @@ jobs:
 
       - name: Generate coverage report
         run: |
-          lcov --directory build-coverage --capture --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' '*/_deps/*' '*/tests/*' --output-file coverage.info
+          lcov --directory build-coverage --capture --output-file coverage.info \
+            --ignore-errors mismatch,gcov,unused
+          lcov --remove coverage.info '/usr/*' '*/_deps/*' '*/tests/*' \
+            --output-file coverage.info --ignore-errors unused
           lcov --list coverage.info
 
       - name: Upload coverage report
